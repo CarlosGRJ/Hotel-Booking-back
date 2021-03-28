@@ -13,6 +13,7 @@ dbConnection();
 // middlewares
 app.use(cors());
 app.use(morgan('dev'));
+app.use(express.json());
 
 // route middleware
 readdirSync('./routes').map((r) => app.use('/api', require(`./routes/${r}`)));
