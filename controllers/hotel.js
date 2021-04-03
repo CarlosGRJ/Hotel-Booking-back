@@ -28,3 +28,21 @@ export const create = async (req, res) => {
       });
    }
 };
+
+export const hotels = async (req, res) => {
+   const all = await Hotel.find({})
+      .limit(24)
+      .select('-image.data')
+      .populate('postedBy', '_id name')
+      .exec();
+
+   res.json(all);
+};
+
+export const image = async (req, res) => {
+   const hotel = await Hotel.findById(req.params.hotelId).exec();
+   if (hotel && hotel.image && hotel.image.data !== null) {
+      res.set('Content-Type', hotel.image.contentType);
+      return res.send(hotel.image.data);
+   }
+};
