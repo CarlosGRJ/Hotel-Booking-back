@@ -63,3 +63,38 @@ export const remove = async (req, res) => {
       .exec();
    res.json(removed);
 };
+
+export const read = async (req, res) => {
+   const hotel = await Hotel.findById(req.params.hotelId)
+      .select('-image.data')
+      .exec();
+   console.log('SINGLE HOTEL', hotel);
+   res.json(hotel);
+};
+
+export const update = async (req, res) => {
+   try {
+      const fields = req.fields;
+      const files = req.files;
+
+      const data = { ...fields };
+      console.log('data ', data);
+
+      if (files.image) {
+         let image = {};
+         image.data = fs.readFileSync(files.image.path);
+         image.contentType = files.image.type;
+
+         data.image = image;
+      }
+
+      const updated = await Hotel.findByIdAndUpdate(req.params.hotelId, data, {
+         new: true,
+      }).select('-image.data');
+
+      res.json(updated)
+   } catch (error) {
+      console.log(error);
+      res.status(400).send('Hotel update failed. Try again.');
+   }
+};
