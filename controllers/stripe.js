@@ -142,6 +142,4 @@ export const stripeSessionId = async (req, res) => {
    res.send({
       sessionId: session.id,
    });
-
-   console.log('SESSION ======> ', session);
 };
