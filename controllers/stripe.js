@@ -130,7 +130,7 @@ export const stripeSessionId = async (req, res) => {
          },
       },
       // success and cancel urls
-      success_url: process.env.STRIPE_SUCCESS_URL,
+      success_url: `${process.env.STRIPE_SUCCESS_URL}/${item._id}`,
       cancel_url: process.env.STRIPE_CANCEL_URL,
    });
 
@@ -143,3 +143,8 @@ export const stripeSessionId = async (req, res) => {
       sessionId: session.id,
    });
 };
+
+
+export const stripeSuccess = async (req, res) => {
+   //
+}
