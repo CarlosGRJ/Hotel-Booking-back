@@ -32,6 +32,8 @@ export const create = async (req, res) => {
 };
 
 export const hotels = async (req, res) => {
+   // const all = awai Hotel.find({ from: { $gte: new Date() }})  ya no apareceran hoteles cuya fecha expiró
+   // $gte = greater than
    const all = await Hotel.find({})
       .limit(24)
       .select('-image.data')
@@ -105,10 +107,52 @@ export const update = async (req, res) => {
 
 export const userHotelBookings = async (req, res) => {
    const all = await Order.find({ orderedBy: req.user._id })
-      .select('session')
+      .select('session') // Creo que esta de más este select
       .populate('hotel', '-image.data')
       .populate('orderedBy', '_id name')
       .exec();
 
    res.json(all);
 };
+
+export const isAlreadyBooked = async (req, res) => {
+   const { hotelId } = req.params;
+   // find orders of the currently logged in user
+   const userOrders = await Order.find({ orderedBy: req.user._id })
+      .select('hotel')
+      .exec();
+   // check if hotel id is found in userOrders array
+   const ids = [];
+   for (let i = 0; i < userOrders.length; i++) {
+      ids.push(userOrders[i].hotel.toString());
+   }
+
+   res.json({
+      ok: ids.includes(hotelId),
+   });
+};
+
+export const searchListings = async (req, res) => {
+   const { location, date, bed } = req.body;
+   // console.log(location, date, bed);
+   const fromDate = date.split(',');
+
+   const result = await Hotel.find({
+      from: { $gte: new Date(fromDate[0]) },
+      location,
+   })
+      .select('-image.data')
+      .exec();
+
+   res.json(result);
+};
+
+/*
+   If you want to be more specific
+   const result = await Hotel.find({
+      from: { $gte: new Date() },
+      to: { $lte: to },
+      location,
+      bed
+   })
+*/
